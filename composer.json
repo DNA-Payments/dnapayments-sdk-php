@@ -1,0 +1,14 @@
+{
+    "name": "dna/dnapayments-sdk-php",
+    "description": "DNA payments library for php",
+    "type": "library",
+    "require": {
+        "rmccue/requests": "^1.7"
+    },
+    "authors": [
+        {
+            "name": "Alikhan Izbergenov",
+            "email": "alikhan@dnapayments.com"
+        }
+    ]
+}
