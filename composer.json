@@ -1,6 +1,7 @@
 {
     "name": "dna/dnapayments-sdk-php",
     "description": "DNA payments library for php",
+    "license": "MIT",
     "type": "library",
     "require": {
         "rmccue/requests": "^1.7"
@@ -10,5 +11,10 @@
             "name": "Alikhan Izbergenov",
             "email": "alikhan@dnapayments.com"
         }
-    ]
+    ],
+    "autoload": {
+        "psr-4": {
+            "DNAPayments\\": "lib/"
+        }
+    }
 }
