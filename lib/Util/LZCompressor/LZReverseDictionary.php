@@ -6,7 +6,7 @@
  * Time: 12:53
  */
 
-namespace DNAPaymentsApi\Util\LZCompressor;
+namespace DNAPayments\Util\LZCompressor;
 
 class LZReverseDictionary
 {

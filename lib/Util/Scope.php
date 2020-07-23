@@ -1,6 +1,6 @@
 <?php
 
-namespace DNAPaymentsApi\Util;
+namespace DNAPayments\Util;
 
 class Scope {
     private static $INTEGRATION_HOSTED = 'integration_hosted';

@@ -6,7 +6,7 @@
  * Time: 15:54
  */
 
-namespace DNAPaymentsApi\Util\LZCompressor;
+namespace DNAPayments\Util\LZCompressor;
 
 
 class LZUtil16

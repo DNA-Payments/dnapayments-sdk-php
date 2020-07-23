@@ -1,12 +1,15 @@
 <?php
 
-namespace DNAPaymentsApi;
+namespace DNAPayments;
 
-use DNAPaymentsApi\Util\Scope;
-use DNAPaymentsApi\Util\HTTPRequester;
-use DNAPaymentsApi\Util\LZCompressor\LZString;
+use DNAPayments\Util\Scope;
+use DNAPayments\Util\HTTPRequester;
+use DNAPayments\Util\LZCompressor\LZString;
 
-class DNAPaymentsApi {
+class DNAPayments {
+    public function __construct($config) {
+        self::configure($config);
+    }
 
     private static $config = [
         'isTestMode' => false,
@@ -20,6 +23,21 @@ class DNAPaymentsApi {
     ];
 
 
+    private static function configure($config) {
+        if(empty($config)) return;
+        if(!empty($config->isTestMode)) {
+            self::$config['isTestMode'] = $config->isTestMode;
+        }
+        if(!empty($config->scopes)) {
+            self::$config['scopes'] = $config->scopes;
+        }
+    }
+
+    private static function encodeToUrl($data)
+    {
+        return base64_encode(LZString::compressToEncodedURIComponent(json_encode($data)));
+    }
+
     private static function getPath()
     {
         if (self::$config['isTestMode']) {
@@ -32,11 +50,6 @@ class DNAPaymentsApi {
             'authUrl' => self::$fiels['authUrl'],
             'paymentPageUrl' => self::$fiels['paymentPageUrl']
         ];
-    }
-
-    private static function encodeToUrl($data)
-    {
-        return base64_encode(LZString::compressToEncodedURIComponent(json_encode($data)));
     }
 
     public static function auth($data)

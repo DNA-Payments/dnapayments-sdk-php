@@ -1,5 +1,5 @@
 <?php
-namespace DNAPaymentsApi\Util;
+namespace DNAPayments\Util;
 
 class HTTPRequester
 {

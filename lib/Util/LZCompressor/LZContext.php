@@ -1,5 +1,5 @@
 <?php
-namespace DNAPaymentsApi\Util\LZCompressor;
+namespace DNAPayments\Util\LZCompressor;
 
 
 class LZContext
