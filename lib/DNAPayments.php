@@ -26,10 +26,10 @@ class DNAPayments {
     private static function configure($config) {
         if(empty($config)) return;
         if(array_key_exists('isTestMode', $config)) {
-            self::$config['isTestMode'] = $config->isTestMode;
+            self::$config['isTestMode'] = $config['isTestMode'];
         }
         if(array_key_exists('scopes', $config)) {
-            self::$config['scopes'] = $config->scopes;
+            self::$config['scopes'] = $config['scopes'];
         }
     }
 
@@ -57,13 +57,13 @@ class DNAPayments {
         $authData = [
             'grant_type' => 'client_credentials',
             'scope' => Scope::getScopes(self::$config['scopes']),
-            'client_id' => $data->client_id,
-            'client_secret' => $data->client_secret,
-            'terminal' => $data->terminal,
-            'invoiceId' => strval($data->invoiceId),
-            'amount' => floatval($data->amount),
-            'currency' => strval($data->currency),
-            'paymentFormURL' => property_exists($data, 'paymentFormURL') ? $data->paymentFormURL : self::getBaseUrl() // todo: add
+            'client_id' => $data['client_id'],
+            'client_secret' => $data['client_secret'],
+            'terminal' => $data['terminal'],
+            'invoiceId' => strval($data['invoiceId']),
+            'amount' => floatval($data['amount']),
+            'currency' => strval($data['currency']),
+            'paymentFormURL' => array_key_exists('paymentFormURL', $data) ? $data['paymentFormURL'] : self::getBaseUrl() // todo: add
         ];
 
         $response = HTTPRequester::HTTPPost(self::getPath()->authUrl, [], $authData);
@@ -87,24 +87,24 @@ class DNAPayments {
     {
         return self::getPath()->paymentPageUrl . '/?params=' . self::encodeToUrl((object) [
                 'auth' => $authToken,
-                'invoiceId' => strval($order->invoiceId),
-                'terminal' => $order->terminal,
-                'amount' => floatval($order->amount),
-                'currency' => strval($order->currency),
-                'postLink' => strval($order->postLink),
-                'failurePostLink' => strval($order->failurePostLink),
-                'backLink' => strval($order->backLink),
-                'failureBackLink' => strval($order->failureBackLink),
-                'language' => property_exists($order, 'language') ? strval($order->language) : 'eng',
-                'description' => strval($order->description),
-                'accountId' => $order->accountId,
-                'accountCountry' => $order->accountCountry,
-                'accountCity' => $order->accountCity,
-                'accountStreet1' => $order->accountStreet1,
-                'accountEmail' => $order->accountEmail,
-                'accountFirstName' => $order->accountFirstName,
-                'accountLastName' => $order->accountLastName,
-                'accountPostalCode' => $order->accountPostalCode
+                'invoiceId' => strval($order['invoiceId']),
+                'terminal' => $order['terminal'],
+                'amount' => floatval($order['amount']),
+                'currency' => strval($order['currency']),
+                'postLink' => strval($order['postLink']),
+                'failurePostLink' => strval($order['failurePostLink']),
+                'backLink' => strval($order['backLink']),
+                'failureBackLink' => strval($order['failureBackLink']),
+                'language' => array_key_exists('language', $order) ? strval($order['language']) : 'eng',
+                'description' => strval($order['description']),
+                'accountId' => $order['accountId'],
+                'accountCountry' => $order['accountCountry'],
+                'accountCity' => $order['accountCity'],
+                'accountStreet1' => $order['accountStreet1'],
+                'accountEmail' => $order['accountEmail'],
+                'accountFirstName' => $order['accountFirstName'],
+                'accountLastName' => $order['accountLastName'],
+                'accountPostalCode' => $order['accountPostalCode']
             ]) . '&data=' . self::encodeToUrl((object) [
                 'isTest' => self::$config['isTestMode']
             ]);
@@ -112,7 +112,7 @@ class DNAPayments {
 
     public static function isValidSignature($result, $secret)
     {
-        $string = $result->id . $result->amount . $result->currency . $result->invoiceId . $result->errorCode . json_encode($result->success);
-        return base64_encode(hash_hmac('sha256', $string, $secret, true)) == $result->signature;
+        $string = $result['id'] . $result['amount'] . $result['currency'] . $result['invoiceId'] . $result['errorCode'] . json_encode($result['success']);
+        return base64_encode(hash_hmac('sha256', $string, $secret, true)) == $result['signature'];
     }
 }
