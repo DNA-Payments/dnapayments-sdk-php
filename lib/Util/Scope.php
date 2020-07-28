@@ -9,13 +9,13 @@ class Scope {
     public static function getScopes($config) {
         $scopes = ['payment'];
         if (array_key_exists('allowHosted', $config)) {
-            $scopes.push(self::$INTEGRATION_HOSTED);
+            array_push($scopes, self::$INTEGRATION_HOSTED);
         }
         if (array_key_exists('allowEmbedded', $config)){
-            $scopes.push(self::$INTEGRATION_EMBEDDED);
+            array_push($scopes, self::$INTEGRATION_EMBEDDED);
         }
         if (array_key_exists('allowSeamless', $config)) {
-            $scopes.push(self::$INTEGRATION_SEAMLESS);
+            array_push($scopes, self::$INTEGRATION_SEAMLESS);
         }
         return implode(' ', $scopes);
     }

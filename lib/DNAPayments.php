@@ -83,12 +83,12 @@ class DNAPayments {
         );
     }
 
-    public static function generateUrl($order, $authToken, $terminal)
+    public static function generateUrl($order, $authToken)
     {
         return self::getPath()->paymentPageUrl . '/?params=' . self::encodeToUrl((object) [
                 'auth' => $authToken,
                 'invoiceId' => strval($order->invoiceId),
-                'terminal' => $terminal,
+                'terminal' => $order->terminal,
                 'amount' => floatval($order->amount),
                 'currency' => strval($order->currency),
                 'postLink' => strval($order->postLink),
