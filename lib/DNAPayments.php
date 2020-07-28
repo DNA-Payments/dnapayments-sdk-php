@@ -63,7 +63,7 @@ class DNAPayments {
             'invoiceId' => strval($data->invoiceId),
             'amount' => floatval($data->amount),
             'currency' => strval($data->currency),
-            'paymentFormURL' => '' // todo: add
+            'paymentFormURL' => property_exists($data, 'paymentFormURL') ? $data->paymentFormURL : self::getBaseUrl() // todo: add
         ];
 
         $response = HTTPRequester::HTTPPost(self::getPath()->authUrl, [], $authData);
@@ -72,6 +72,15 @@ class DNAPayments {
         }
 
         throw new \Error('Error: No auth service');
+    }
+
+    private static function getBaseUrl() {
+        return sprintf(
+            "%s://%s%s",
+            isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off' ? 'https' : 'http',
+            $_SERVER['SERVER_NAME'],
+            $_SERVER['REQUEST_URI']
+        );
     }
 
     public static function generateUrl($order, $authToken, $terminal)
@@ -86,7 +95,7 @@ class DNAPayments {
                 'failurePostLink' => strval($order->failurePostLink),
                 'backLink' => strval($order->backLink),
                 'failureBackLink' => strval($order->failureBackLink),
-                'language' => !empty($order->language) ? strval($order->language) : 'eng',
+                'language' => property_exists($order, 'language') ? strval($order->language) : 'eng',
                 'description' => strval($order->description),
                 'accountId' => $order->accountId,
                 'accountCountry' => $order->accountCountry,
