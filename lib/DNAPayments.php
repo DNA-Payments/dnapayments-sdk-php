@@ -7,13 +7,13 @@ use DNAPayments\Util\HTTPRequester;
 use DNAPayments\Util\LZCompressor\LZString;
 
 class DNAPayments {
-    public function __construct($config) {
+    public function __construct($config = null) {
         self::configure($config);
     }
 
     private static $config = [
         'isTestMode' => false,
-        'scopes' => (object)[]
+        'scopes' => []
     ];
     private static $fiels = [
         'authUrl' => 'https://oauth.dnapayments.com/oauth2/token',
@@ -25,10 +25,10 @@ class DNAPayments {
 
     private static function configure($config) {
         if(empty($config)) return;
-        if(property_exists($config, 'isTestMode')) {
+        if(array_key_exists('isTestMode', $config)) {
             self::$config['isTestMode'] = $config->isTestMode;
         }
-        if(property_exists($config, 'scopes')) {
+        if(array_key_exists('scopes', $config)) {
             self::$config['scopes'] = $config->scopes;
         }
     }

@@ -8,13 +8,13 @@ class Scope {
     private static $INTEGRATION_SEAMLESS = 'integration_seamless';
     public static function getScopes($config) {
         $scopes = ['payment'];
-        if (property_exists($config, 'allowHosted')) {
+        if (array_key_exists('allowHosted', $config)) {
             $scopes.push(self::$INTEGRATION_HOSTED);
         }
-        if (property_exists($config, 'allowEmbedded')){
+        if (array_key_exists('allowEmbedded', $config)){
             $scopes.push(self::$INTEGRATION_EMBEDDED);
         }
-        if (property_exists($config, 'allowSeamless')) {
+        if (array_key_exists('allowSeamless', $config)) {
             $scopes.push(self::$INTEGRATION_SEAMLESS);
         }
         return implode(' ', $scopes);
