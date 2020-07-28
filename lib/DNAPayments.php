@@ -25,10 +25,10 @@ class DNAPayments {
 
     private static function configure($config) {
         if(empty($config)) return;
-        if(!empty($config->isTestMode)) {
+        if(property_exists($config, 'isTestMode')) {
             self::$config['isTestMode'] = $config->isTestMode;
         }
-        if(!empty($config->scopes)) {
+        if(property_exists($config, 'scopes')) {
             self::$config['scopes'] = $config->scopes;
         }
     }
@@ -63,7 +63,7 @@ class DNAPayments {
             'invoiceId' => strval($data->invoiceId),
             'amount' => floatval($data->amount),
             'currency' => strval($data->currency),
-            'paymentFormURL' => ''
+            'paymentFormURL' => '' // todo: add
         ];
 
         $response = HTTPRequester::HTTPPost(self::getPath()->authUrl, [], $authData);
