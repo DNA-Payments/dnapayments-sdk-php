@@ -13,7 +13,7 @@ class DNAPayments {
 
     private static $config = [
         'isTestMode' => false,
-        'scopes' => []
+        'scopes' => (object)[]
     ];
     private static $fiels = [
         'authUrl' => 'https://oauth.dnapayments.com/oauth2/token',
