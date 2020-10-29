@@ -24,10 +24,10 @@ class HTTPRequester
      * @description Make HTTP-POST call
      * @param       $url
      * @param array $headers
-     * @param array $options
+     * @param array|string $options
      * @return array HTTP-Response body or an empty string if the request fails or is empty
      */
-    public static function HTTPPost($url, array $headers, array $options)
+    public static function HTTPPost($url, array $headers, $options)
     {
         $request = \Requests::post($url, $headers, $options);
 

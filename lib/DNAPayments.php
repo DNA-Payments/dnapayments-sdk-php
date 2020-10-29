@@ -83,17 +83,19 @@ class DNAPayments {
 
     private function refundRequest($token, $transaction_id, $amount) {
         try {
-            $response = HTTPRequester::HTTPPost(self::getPath()->apiUrl . '/transaction/operation/refund', array(
-                'Authorization' => 'Bearer ' . $token
-            ), array(
+            $refundData = [
                 'id' => $transaction_id,
-                'amount' => $amount
-            ) );
+                'amount' => floatval($amount)
+            ];
+            $response = HTTPRequester::HTTPPost(self::getPath()->apiUrl . '/transaction/operation/refund', array(
+                'Authorization' => 'Bearer ' . $token,
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json'
+            ), json_encode($refundData));
 
             if ($response != null && $response['status'] >= 200 && $response['status'] < 400) {
                 return $response['response'];
             }
-
             throw new \Exception('Error: Refund request error');
         } catch (Exception $e) {
             throw $e;
