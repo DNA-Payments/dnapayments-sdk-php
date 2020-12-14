@@ -16,7 +16,7 @@ class DNAPayments {
         'isTestMode' => false,
         'scopes' => []
     ];
-    private static $fiels = [
+    private static $fields = [
         'authUrl' => 'https://oauth.dnapayments.com/oauth2/token',
         'testAuthUrl' => 'https://test-oauth.dnapayments.com/oauth2/token',
         'testPaymentUrl' => 'https://test-pay.dnapayments.com',
@@ -45,19 +45,19 @@ class DNAPayments {
     {
         if (self::$config['isTestMode']) {
             return (object) [
-                'authUrl' => self::$fiels['testAuthUrl'],
-                'paymentUrl' => self::$fiels['testPaymentUrl'],
-                'apiUrl' => self::$fiels['testApiUrl'],
+                'authUrl' => self::$fields['testAuthUrl'],
+                'paymentUrl' => self::$fields['testPaymentUrl'],
+                'apiUrl' => self::$fields['testApiUrl'],
             ];
         }
         return (object) [
-            'authUrl' => self::$fiels['authUrl'],
-            'paymentUrl' => self::$fiels['paymentUrl'],
-            'apiUrl' => self::$fiels['apiUrl']
+            'authUrl' => self::$fields['authUrl'],
+            'paymentUrl' => self::$fields['paymentUrl'],
+            'apiUrl' => self::$fields['apiUrl']
         ];
     }
 
-    private function refundAuth($data) {
+    private function authApi($data) {
         try {
             $authData = [
                 'grant_type' => 'client_credentials',
@@ -104,9 +104,58 @@ class DNAPayments {
 
 
     public function refund($data) {
-        $auth = self::refundAuth($data);
-        $response = self::refundRequest($auth['access_token'], $data['transaction_id'], $data['amount']);
-        return $response;
+        $auth = self::authApi($data);
+        return self::refundRequest($auth['access_token'], $data['transaction_id'], $data['amount']);
+    }
+
+    private function cancelRequest($token, $transaction_id) {
+        try {
+            $response = HTTPRequester::HTTPPost(self::getPath()->apiUrl . '/transaction/operation/cancel', array(
+                'Authorization' => 'Bearer ' . $token,
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json'
+            ), json_encode([
+                'id' => $transaction_id
+            ]));
+
+            if ($response != null && $response['status'] >= 200 && $response['status'] < 400) {
+                return $response['response'];
+            }
+            throw new \Exception('Error: Cancel request error');
+        } catch (Exception $e) {
+            throw $e;
+        }
+    }
+
+    public function cancel($data) {
+        $auth = self::authApi($data);
+        return self::cancelRequest($auth['access_token'], $data['transaction_id']);
+    }
+
+    private function chargeRequest($token, $transaction_id, $amount) {
+        try {
+            $chargeData = [
+                'id' => $transaction_id,
+                'amount' => floatval($amount)
+            ];
+            $response = HTTPRequester::HTTPPost(self::getPath()->apiUrl . '/transaction/operation/charge', array(
+                'Authorization' => 'Bearer ' . $token,
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json'
+            ), json_encode($chargeData));
+
+            if ($response != null && $response['status'] >= 200 && $response['status'] < 400) {
+                return $response['response'];
+            }
+            throw new \Exception('Error: Charge request error');
+        } catch (Exception $e) {
+            throw $e;
+        }
+    }
+
+    public function charge($data) {
+        $auth = self::authApi($data);
+        return self::chargeRequest($auth['access_token'], $data['transaction_id'], $data['amount']);
     }
 
     public static function auth($data) {
@@ -120,7 +169,7 @@ class DNAPayments {
                 'invoiceId' => strval($data['invoiceId']),
                 'amount' => floatval($data['amount']),
                 'currency' => strval($data['currency']),
-                'paymentFormURL' => array_key_exists('paymentFormURL', $data) ? $data['paymentFormURL'] : self::getBaseUrl() // todo: add
+                'paymentFormURL' => array_key_exists('paymentFormURL', $data) ? $data['paymentFormURL'] : self::getPath()->paymentUrl . '/checkout/' // todo: add
             ];
 
             $response = HTTPRequester::HTTPPost(self::getPath()->authUrl, [], $authData);
@@ -134,7 +183,7 @@ class DNAPayments {
         }
     }
 
-    private static function getBaseUrl() {
+    public static function getBaseUrl() {
         return sprintf(
             "%s://%s%s",
             isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off' ? 'https' : 'http',
