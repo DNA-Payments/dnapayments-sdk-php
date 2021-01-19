@@ -19,7 +19,7 @@ class LZString
             $input,
             6,
             function($a) {
-                return LZUtil::$keyStrUriSafe{$a};
+                return LZUtil::$keyStrUriSafe[$a];
             }
         );
     }
@@ -56,7 +56,7 @@ class LZString
     public static function compressToBase64($input)
     {
         $res = self::_compress($input, 6, function($a) {
-            return LZUtil::$keyStrBase64{$a};
+            return LZUtil::$keyStrBase64[$a];
         });
         switch (strlen($res) % 4) { // To produce valid Base64
             default: // When could this happen ?
@@ -327,7 +327,7 @@ class LZString
             }
             else {
                 if ($c == $dictionary->size()) {
-                    $entry = $w . $w{0};
+                    $entry = $w . $w[0];
                 } else {
                     return null;
                 }

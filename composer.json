@@ -3,7 +3,7 @@
     "description": "DNA payments library for php",
     "license": "MIT",
     "type": "library",
-    "version": "1.0.2",
+    "version": "1.1.0",
     "require": {
         "rmccue/requests": "^1.7"
     },
