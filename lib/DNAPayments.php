@@ -5,7 +5,7 @@ namespace DNAPayments;
 use DNAPayments\Util\Scope;
 use DNAPayments\Util\HTTPRequester;
 use DNAPayments\Util\LZCompressor\LZString;
-use mysql_xdevapi\Exception;
+use DNAPayments\Includes\RequestException;
 
 class DNAPayments {
     public function __construct($config = null) {
@@ -57,6 +57,14 @@ class DNAPayments {
         ];
     }
 
+    private function getJSONHeader($token) {
+        return array(
+            'Authorization' => 'Bearer ' . $token,
+            'Content-Type' => 'application/json',
+            'Accept' => 'application/json'
+        );
+    }
+
     private function authApi($data) {
         try {
             $authData = [
@@ -75,7 +83,7 @@ class DNAPayments {
                 return $response['response'];
             }
 
-            throw new \Exception('Error: No auth service');
+            throw new RequestException($response['response']);
         } catch (Exception $e) {
             throw $e;
         }
@@ -87,16 +95,12 @@ class DNAPayments {
                 'id' => $transaction_id,
                 'amount' => floatval($amount)
             ];
-            $response = HTTPRequester::HTTPPost(self::getPath()->apiUrl . '/transaction/operation/refund', array(
-                'Authorization' => 'Bearer ' . $token,
-                'Content-Type' => 'application/json',
-                'Accept' => 'application/json'
-            ), json_encode($refundData));
+            $response = HTTPRequester::HTTPPost(self::getPath()->apiUrl . '/transaction/operation/refund', $this->getJSONHeader($token), json_encode($refundData));
 
             if ($response != null && $response['status'] >= 200 && $response['status'] < 400) {
                 return $response['response'];
             }
-            throw new \Exception('Error: Refund request error');
+            throw new RequestException($response['response']);
         } catch (Exception $e) {
             throw $e;
         }
@@ -110,18 +114,14 @@ class DNAPayments {
 
     private function cancelRequest($token, $transaction_id) {
         try {
-            $response = HTTPRequester::HTTPPost(self::getPath()->apiUrl . '/transaction/operation/cancel', array(
-                'Authorization' => 'Bearer ' . $token,
-                'Content-Type' => 'application/json',
-                'Accept' => 'application/json'
-            ), json_encode([
+            $response = HTTPRequester::HTTPPost(self::getPath()->apiUrl . '/transaction/operation/cancel', $this->getJSONHeader($token), json_encode([
                 'id' => $transaction_id
             ]));
 
             if ($response != null && $response['status'] >= 200 && $response['status'] < 400) {
                 return $response['response'];
             }
-            throw new \Exception('Error: Cancel request error');
+            throw new RequestException($response['response']);
         } catch (Exception $e) {
             throw $e;
         }
@@ -138,16 +138,12 @@ class DNAPayments {
                 'id' => $transaction_id,
                 'amount' => floatval($amount)
             ];
-            $response = HTTPRequester::HTTPPost(self::getPath()->apiUrl . '/transaction/operation/charge', array(
-                'Authorization' => 'Bearer ' . $token,
-                'Content-Type' => 'application/json',
-                'Accept' => 'application/json'
-            ), json_encode($chargeData));
+            $response = HTTPRequester::HTTPPost(self::getPath()->apiUrl . '/transaction/operation/charge', $this->getJSONHeader($token), json_encode($chargeData));
 
             if ($response != null && $response['status'] >= 200 && $response['status'] < 400) {
                 return $response['response'];
             }
-            throw new \Exception('Error: Charge request error');
+            throw new RequestException($response['response']);
         } catch (Exception $e) {
             throw $e;
         }
@@ -176,7 +172,7 @@ class DNAPayments {
             if ($response != null && $response['status'] >= 200 && $response['status'] < 400) {
                 return $response['response'];
             }
-            throw new \Exception('Error: No auth service');
+            throw new RequestException($response['response']);
 
         } catch (Exception $e) {
             throw $e;
@@ -194,27 +190,11 @@ class DNAPayments {
 
     public static function generateUrl($order, $authToken)
     {
-        return self::getPath()->paymentUrl . '/checkout/?params=' . self::encodeToUrl((object) [
-                'auth' => $authToken,
-                'invoiceId' => strval($order['invoiceId']),
-                'terminal' => $order['terminal'],
-                'amount' => floatval($order['amount']),
-                'currency' => strval($order['currency']),
-                'postLink' => strval($order['postLink']),
-                'failurePostLink' => strval($order['failurePostLink']),
-                'backLink' => strval($order['backLink']),
-                'failureBackLink' => strval($order['failureBackLink']),
-                'language' => array_key_exists('language', $order) ? strval($order['language']) : 'eng',
-                'description' => strval($order['description']),
-                'accountId' => $order['accountId'],
-                'accountCountry' => $order['accountCountry'],
-                'accountCity' => $order['accountCity'],
-                'accountStreet1' => $order['accountStreet1'],
-                'accountEmail' => $order['accountEmail'],
-                'accountFirstName' => $order['accountFirstName'],
-                'accountLastName' => $order['accountLastName'],
-                'accountPostalCode' => $order['accountPostalCode']
-            ]) . '&data=' . self::encodeToUrl((object) [
+
+        $payload = array(
+            'auth' => $authToken
+        );
+        return self::getPath()->paymentUrl . '/checkout/?params='. self::encodeToUrl((object) array_merge($payload, $order)) . '&data=' . self::encodeToUrl((object) [
                 'isTest' => self::$config['isTestMode']
             ]);
     }
