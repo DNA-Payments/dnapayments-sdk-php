@@ -5,7 +5,7 @@ namespace DNAPayments;
 use DNAPayments\Util\Scope;
 use DNAPayments\Util\HTTPRequester;
 use DNAPayments\Util\LZCompressor\LZString;
-use DNAPayments\Includes\RequestException;
+use DNAPayments\Util\RequestException;
 
 class DNAPayments {
     public function __construct($config = null) {
@@ -83,7 +83,7 @@ class DNAPayments {
                 return $response['response'];
             }
 
-            throw new RequestException($response['response']);
+            throw new RequestException($response);
         } catch (Exception $e) {
             throw $e;
         }
@@ -100,7 +100,7 @@ class DNAPayments {
             if ($response != null && $response['status'] >= 200 && $response['status'] < 400) {
                 return $response['response'];
             }
-            throw new RequestException($response['response']);
+            throw new RequestException($response);
         } catch (Exception $e) {
             throw $e;
         }
@@ -121,7 +121,7 @@ class DNAPayments {
             if ($response != null && $response['status'] >= 200 && $response['status'] < 400) {
                 return $response['response'];
             }
-            throw new RequestException($response['response']);
+            throw new RequestException($response);
         } catch (Exception $e) {
             throw $e;
         }
@@ -143,7 +143,7 @@ class DNAPayments {
             if ($response != null && $response['status'] >= 200 && $response['status'] < 400) {
                 return $response['response'];
             }
-            throw new RequestException($response['response']);
+            throw new RequestException($response);
         } catch (Exception $e) {
             throw $e;
         }
@@ -172,7 +172,7 @@ class DNAPayments {
             if ($response != null && $response['status'] >= 200 && $response['status'] < 400) {
                 return $response['response'];
             }
-            throw new RequestException($response['response']);
+            throw new RequestException($response);
 
         } catch (Exception $e) {
             throw $e;
