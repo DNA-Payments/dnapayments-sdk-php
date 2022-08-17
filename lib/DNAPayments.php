@@ -26,7 +26,7 @@ class DNAPayments {
     ];
 
 
-    private static function configure($config) {
+    public static function configure($config) {
         if(empty($config)) return;
         if(array_key_exists('isTestMode', $config)) {
             self::$config['isTestMode'] = $config['isTestMode'];
