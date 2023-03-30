@@ -12,7 +12,7 @@ class HTTPRequester
      */
     public static function HTTPGet($url, array $headers, array $options)
     {
-        $request = \Requests::get($url, $headers, $options);
+        $request = \WpOrg\Requests\Requests::get($url, $headers, $options);
 
         return [
             "status" => $request->status_code,
@@ -29,7 +29,7 @@ class HTTPRequester
      */
     public static function HTTPPost($url, array $headers, $options)
     {
-        $request = \Requests::post($url, $headers, $options);
+        $request = \WpOrg\Requests\Requests::post($url, $headers, $options);
 
         return [
             "status" => $request->status_code,
@@ -47,7 +47,7 @@ class HTTPRequester
      */
     public static function HTTPPut($url, array $headers, array $options)
     {
-        $request = \Requests::put($url, $headers, $options);
+        $request = \WpOrg\Requests\Requests::put($url, $headers, $options);
 
         return [
             "status" => $request->status_code,
@@ -64,7 +64,7 @@ class HTTPRequester
      */
     public static function HTTPDelete($url, array $headers, array $options)
     {
-        $request = \Requests::delete($url, $headers, $options);
+        $request = \WpOrg\Requests\Requests::delete($url, $headers, $options);
 
         return [
             "status" => $request->status_code,
