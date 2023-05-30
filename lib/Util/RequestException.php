@@ -8,7 +8,7 @@ class RequestException extends \Exception {
     public function __construct($data = null)
     {
         $status = $data['status'];
-        $code= !empty($data['response']) ? $data['response']['errorCode'] : 400;
+        $code= !empty($data['response']) ? $data['response']['code'] : 400;
         $message = !empty($data['response']) ? $data['response']['message'] : 'Server Error';
         $this->data = $data;
         $this->status = $status;
