@@ -100,7 +100,7 @@ class DNAPayments {
             if ($response != null && $response['status'] >= 200 && $response['status'] < 400) {
                 return $response['response'];
             }
-            throw new RequestException($response);
+            throw new RequestException($response, 'errorCode');
         } catch (Exception $e) {
             throw $e;
         }
@@ -121,7 +121,7 @@ class DNAPayments {
             if ($response != null && $response['status'] >= 200 && $response['status'] < 400) {
                 return $response['response'];
             }
-            throw new RequestException($response);
+            throw new RequestException($response, 'errorCode');
         } catch (Exception $e) {
             throw $e;
         }
@@ -143,7 +143,7 @@ class DNAPayments {
             if ($response != null && $response['status'] >= 200 && $response['status'] < 400) {
                 return $response['response'];
             }
-            throw new RequestException($response);
+            throw new RequestException($response, 'errorCode');
         } catch (Exception $e) {
             throw $e;
         }
