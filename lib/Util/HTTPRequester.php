@@ -1,8 +1,12 @@
 <?php
 namespace DNAPayments\Util;
 
+use GuzzleHttp\Client;
+
 class HTTPRequester
 {
+    private static $httpClient;
+
     /**
      * @description Make HTTP-GET call
      * @param       $url
@@ -10,14 +14,9 @@ class HTTPRequester
      * @param array $options
      * @return      HTTP-Response body or an empty string if the request fails or is empty
      */
-    public static function HTTPGet($url, array $headers, array $options)
+    public static function HTTPGet($url, array $headers, array $data = null)
     {
-        $request = \WpOrg\Requests\Requests::get($url, $headers, $options);
-
-        return [
-            "status" => $request->status_code,
-            "response" => json_decode($request->body, true)
-        ];
+        return self::HTTPRequest('GET', $url, $headers, $data);
     }
 
     /**
@@ -27,14 +26,9 @@ class HTTPRequester
      * @param array|string $options
      * @return array HTTP-Response body or an empty string if the request fails or is empty
      */
-    public static function HTTPPost($url, array $headers, $options)
+    public static function HTTPPost($url, array $headers, $data)
     {
-        $request = \WpOrg\Requests\Requests::post($url, $headers, $options);
-
-        return [
-            "status" => $request->status_code,
-            "response" => json_decode($request->body, true)
-        ];
+        return self::HTTPRequest('POST', $url, $headers, $data);
     }
 
     /**
@@ -45,14 +39,9 @@ class HTTPRequester
      * @return array HTTP-Response body or an empty string if the request fails or is empty
      * @throws \Exception
      */
-    public static function HTTPPut($url, array $headers, array $options)
+    public static function HTTPPut($url, array $headers, array $data = null)
     {
-        $request = \WpOrg\Requests\Requests::put($url, $headers, $options);
-
-        return [
-            "status" => $request->status_code,
-            "response" => json_decode($request->body, true)
-        ];
+        return self::HTTPRequest('PUT', $url, $headers, $data);
     }
 
     /**
@@ -62,13 +51,35 @@ class HTTPRequester
      * @return array HTTP-Response body or an empty string if the request fails or is empty
      * @category Make HTTP-DELETE call
      */
-    public static function HTTPDelete($url, array $headers, array $options)
+    public static function HTTPDelete($url, array $headers, array $data)
     {
-        $request = \WpOrg\Requests\Requests::delete($url, $headers, $options);
+        return self::HTTPRequest('DELETE', $url, $headers, $data);
+    }
+
+    private static function HTTPRequest($method, $url, array $headers, $data = null)
+    {
+        $options = [
+            'headers' => $headers
+        ];
+        
+        $contentType = isset($headers['Content-Type']) ? $headers['Content-Type'] : '';
+        if (isset($data)) {
+            if ($contentType === 'application/json') {
+                $options['json'] = $data;
+            } else {
+                $options['form_params'] = $data;
+            }
+        }
+
+        if (self::$httpClient === null) {
+            self::$httpClient = new Client();
+        }
+
+        $raw_response = self::$httpClient->request($method, $url, $options);
 
         return [
-            "status" => $request->status_code,
-            "response" => json_decode($request->body, true)
+            "status" => $raw_response->getStatusCode(),
+            "response" => json_decode($raw_response->getBody(), true)
         ];
     }
 }
