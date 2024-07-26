@@ -12,10 +12,6 @@ class DNAPayments {
         self::configure($config);
     }
 
-    private static $config = [
-        'isTestMode' => false,
-        'scopes' => []
-    ];
     private static $fields = [
         'authUrl' => 'https://oauth.dnapayments.com/oauth2/token',
         'testAuthUrl' => 'https://test-oauth.dnapayments.com/oauth2/token',
@@ -25,14 +21,25 @@ class DNAPayments {
         'apiUrl' => 'https://api.dnapayments.com'
     ];
 
+    private static $config = [
+        'isTestMode' => false,
+        'scopes' => [],
+        'isEnableDonation' => null, // boolean
+        'autoRedirectDelayInMs' => null, // int
+        'paymentTimeoutInSeconds' => null, // int
+        'allowSavingCards' => null, // boolean
+        'cards' => null, // array of objects
+        'disabledCardSchemes' => null, // array of objects,
+        'locale' => null // object
+    ];
 
     public static function configure($config) {
         if(empty($config)) return;
-        if(array_key_exists('isTestMode', $config)) {
-            self::$config['isTestMode'] = $config['isTestMode'];
-        }
-        if(array_key_exists('scopes', $config)) {
-            self::$config['scopes'] = $config['scopes'];
+
+        foreach ($config as $key => $value) {
+            if (array_key_exists($key, self::$config)) {
+                self::$config[$key] = $value;
+            }
         }
     }
 
@@ -188,15 +195,23 @@ class DNAPayments {
         );
     }
 
-    public static function generateUrl($order, $authToken)
+    public static function generateUrl($payment_data, $auth_token)
     {
-
         $payload = array(
-            'auth' => $authToken
+            'auth' => $auth_token
         );
-        return self::getPath()->paymentUrl . '/checkout/?params='. self::encodeToUrl((object) array_merge($payload, $order)) . '&data=' . self::encodeToUrl((object) [
-                'isTest' => self::$config['isTestMode']
-            ]);
+
+        $params_str = self::encodeToUrl((object) array_merge($payload, $payment_data));
+
+        $filled_configs = [];
+
+        foreach (self::$config as $key => $value) {
+            if (!is_null($value)) {
+                $filled_configs[$key] = $value;
+            }
+        }
+
+        return self::getPath()->paymentUrl . '/checkout/?params=' . $params_str . '&data=' . self::encodeToUrl((object) $filled_configs);
     }
 
     public static function isValidSignature($result, $secret)
