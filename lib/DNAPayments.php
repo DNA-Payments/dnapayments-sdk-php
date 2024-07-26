@@ -78,12 +78,17 @@ class DNAPayments {
                 'grant_type' => 'client_credentials',
                 'scope' => 'webapi',
                 'client_id' => $data['client_id'],
-                'client_secret' => $data['client_secret'],
-                'terminal' => $data['terminal'],
-                'invoiceId' => strval($data['invoiceId']),
-                'amount' => floatval($data['amount']),
-                'currency' => strval($data['currency'])
+                'client_secret' => $data['client_secret']
             ];
+
+            $optional_fields = [ 'terminal', 'invoiceId', 'amount', 'currency' ];
+
+            foreach ($optional_fields as $key) {
+                if ( array_key_exists( $key, $data ) ) {
+                    $func = $key == 'amount' ? floatval : strval;
+                    $authData[ $key ] = $func( $data[ $key] );
+                }
+            }
 
             $response = HTTPRequester::HTTPPost(self::getPath()->authUrl, [], $authData);
             if ($response != null && $response['status'] >= 200 && $response['status'] < 400) {
@@ -159,6 +164,40 @@ class DNAPayments {
     public function charge($data) {
         $auth = self::authApi($data);
         return self::chargeRequest($auth['access_token'], $data['transaction_id'], $data['amount']);
+    }
+
+    public function get_client_token($client_id, $client_secret) {
+        return self::authApi([
+            'client_id' => $client_id,
+            'client_secret' => $client_secret
+        ]);
+    }
+
+    public function get_transactions_by_field($client_token, $field_value, $field_name = null) {
+        try {
+            $url = self::getPath()->apiUrl . '/v2/transactions/' . $field_value . '/list';
+
+            if ($field_name) {
+                $url .= '?field=' . $field_name;
+            }
+
+            $response = HTTPRequester::HTTPGet($url, $this->getJSONHeader($client_token));
+
+            if ($response != null && $response['status'] >= 200 && $response['status'] < 400) {
+                return $response['response'];
+            }
+            throw new RequestException($response, 'errorCode');
+        } catch (Exception $e) {
+            throw $e;
+        }
+    }
+
+    public function get_transactions_by_id($client_token, $transaction_id) {
+        return self::get_transactions_by_field($client_token, $transaction_id);
+    }
+
+    public function get_transactions_by_invoice_id($client_token, $invoice_id) {
+        return self::get_transactions_by_field($client_token, $invoice_id, 'invoiceId');
     }
 
     public static function auth($data) {

@@ -10,7 +10,7 @@ class DNAPaymentsTest extends TestCase
     public $client_id = '___ENTER_TEST_CLIENT_ID___';
     public $client_secret = '___ENTER_TEST_CLIENT_SECRET___';
 
-    public function testAuthData() {
+    public function test_auth_data() {
         try {
             \DNAPayments\DNAPayments::configure($this->get_config());
             $auth = \DNAPayments\DNAPayments::auth(array(
@@ -30,12 +30,12 @@ class DNAPaymentsTest extends TestCase
         }
     }
 
-    public function testGenerateUrl() {
+    public function test_generate_url() {
         $invoice_id = date('d-m-y h:i:s');
         $amount = 0.01;
 
         try {
-            \DNAPayments\DNAPayments::configure($this->get_config());
+            \DNAPayments\DNAPayments::configure($this->get_full_config());
 
             $auth = \DNAPayments\DNAPayments::auth(array(
                 'client_id' => $this->client_id,
@@ -58,7 +58,51 @@ class DNAPaymentsTest extends TestCase
         }
     }
 
+    public function test_get_transactions_by_id() {
+        $transaction_id = 'f41e38c0-8d51-48be-aa02-0ff6dd875d48';
+
+        try {
+            $dnapayments = new \DNAPayments\DNAPayments($this->get_config());
+            $auth = $dnapayments->get_client_token($this->client_id, $this->client_secret);
+            $transaction_data = $dnapayments->get_transactions_by_id( $auth['access_token'], $transaction_id );
+
+            print_r($transaction_data);
+
+            $this->assertTrue(true);
+        } catch (Error $e) {
+            echo $e;
+            $this->assertTrue(false);
+        }
+    }
+
+    public function test_get_transactions_by_invoice_id() {
+        $invoice_id = '1721893675976';
+
+        try {
+            $dnapayments = new \DNAPayments\DNAPayments($this->get_config());
+            $auth = $dnapayments->get_client_token($this->client_id, $this->client_secret);
+            $transaction_data = $dnapayments->get_transactions_by_invoice_id( $auth['access_token'], $invoice_id );
+
+            print_r($transaction_data);
+
+            $this->assertTrue(true);
+        } catch (Error $e) {
+            echo $e;
+            $this->assertTrue(false);
+        }
+    }
+
     private function get_config() {
+        return [
+            'isTestMode' => true,
+            'scopes' => [
+                'allowHosted' => true,
+                'allowEmbedded' => true
+            ]
+        ];
+    }
+
+    private function get_full_config() {
         return [
             'isTestMode' => true,
             'scopes' => [
