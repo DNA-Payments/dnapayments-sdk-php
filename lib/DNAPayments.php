@@ -85,8 +85,8 @@ class DNAPayments {
 
             foreach ($optional_fields as $key) {
                 if ( array_key_exists( $key, $data ) ) {
-                    $func = $key == 'amount' ? floatval : strval;
-                    $authData[ $key ] = $func( $data[ $key] );
+                    $func = $key == 'amount' ? 'floatval' : 'strval';
+                    $authData[ $key ] = call_user_func( $func, $data[ $key] );
                 }
             }
 
