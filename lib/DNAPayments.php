@@ -107,7 +107,7 @@ class DNAPayments {
                 'id' => $transaction_id,
                 'amount' => floatval($amount)
             ];
-            $response = HTTPRequester::HTTPPost(self::getPath()->apiUrl . '/transaction/operation/refund', $this->getJSONHeader($token), json_encode($refundData));
+            $response = HTTPRequester::HTTPPost(self::getPath()->apiUrl . '/transaction/operation/refund', $this->getJSONHeader($token), $refundData);
 
             if ($response != null && $response['status'] >= 200 && $response['status'] < 400) {
                 return $response['response'];
@@ -126,9 +126,9 @@ class DNAPayments {
 
     private function cancelRequest($token, $transaction_id) {
         try {
-            $response = HTTPRequester::HTTPPost(self::getPath()->apiUrl . '/transaction/operation/cancel', $this->getJSONHeader($token), json_encode([
+            $response = HTTPRequester::HTTPPost(self::getPath()->apiUrl . '/transaction/operation/cancel', $this->getJSONHeader($token), [
                 'id' => $transaction_id
-            ]));
+            ]);
 
             if ($response != null && $response['status'] >= 200 && $response['status'] < 400) {
                 return $response['response'];
@@ -150,7 +150,7 @@ class DNAPayments {
                 'id' => $transaction_id,
                 'amount' => floatval($amount)
             ];
-            $response = HTTPRequester::HTTPPost(self::getPath()->apiUrl . '/transaction/operation/charge', $this->getJSONHeader($token), json_encode($chargeData));
+            $response = HTTPRequester::HTTPPost(self::getPath()->apiUrl . '/transaction/operation/charge', $this->getJSONHeader($token), $chargeData);
 
             if ($response != null && $response['status'] >= 200 && $response['status'] < 400) {
                 return $response['response'];

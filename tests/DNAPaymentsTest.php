@@ -92,6 +92,30 @@ class DNAPaymentsTest extends TestCase
         }
     }
 
+    public function test_refund() {
+
+        try {
+            $dnapayments = new \DNAPayments\DNAPayments($this->get_config());
+
+            $result = $dnapayments->refund([
+                'client_id' => $this->client_id,
+                'client_secret' => $this->client_secret,
+                'terminal' => $this->terminal,
+                "invoiceId" => "254",
+                "amount" => 21.60,
+                "currency" => "GBP",
+                "transaction_id" => "9a599ca5-5efa-499b-b1d1-be69af20fcec"
+            ]);
+
+            print_r($result);
+
+            $this->assertTrue(true);
+        } catch (Error $e) {
+            echo $e;
+            $this->assertTrue(false);
+        }
+    }
+
     private function get_config() {
         return [
             'isTestMode' => true,
